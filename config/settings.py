@@ -44,7 +44,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     'apps.user',
-    # 'apps.vehicle',
+    'apps.player',
     # 'apps.service_center',
     # 'apps.dealers',
     # 'apps.fleet',
@@ -69,6 +69,16 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.AllowAny",
+    ),
+}
+
 
 ROOT_URLCONF = 'config.urls'
 
