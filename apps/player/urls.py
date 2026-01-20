@@ -44,4 +44,8 @@ urlpatterns = [
     path("awards/", AwardListCreateAPIView.as_view(), name="award-list-create"),
     path("awards/<uuid:id>/", AwardRetrieveUpdateAPIView.as_view(), name="award-detail"),
     path("awards/<uuid:id>/approve/", AwardApprovalAPIView.as_view(), name="award-approve"),
+
+    path("physical-health/", HealthAssessmentListCreateAPIView.as_view()),
+    path("physical-health/<uuid:id>/", HealthAssessmentRetrieveUpdateAPIView.as_view()),
+    path("physical-health/<uuid:id>/approve/", HealthAssessmentApprovalAPIView.as_view()),
 ]
