@@ -4,3 +4,4 @@ from .goalkeeper_stat_serializer import *
 from .club import ClubSerializer
 from .award import *
 from .physical_health import *
+from .training_load import *
