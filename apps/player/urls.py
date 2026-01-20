@@ -37,4 +37,11 @@ urlpatterns = [
         GoalkeeperStatsApprovalAPIView.as_view(),
         name="goalkeeper-stats-approve"
     ),
+
+    path("clubs/", ClubListCreateAPIView.as_view(), name="club-list-create"),
+    path("clubs/<uuid:id>/", ClubRetrieveUpdateAPIView.as_view(), name="club-detail"),
+
+    path("awards/", AwardListCreateAPIView.as_view(), name="award-list-create"),
+    path("awards/<uuid:id>/", AwardRetrieveUpdateAPIView.as_view(), name="award-detail"),
+    path("awards/<uuid:id>/approve/", AwardApprovalAPIView.as_view(), name="award-approve"),
 ]
