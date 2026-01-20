@@ -5,3 +5,4 @@ from .club import Club
 from .award import Award
 from .physical_health import PhysicalHealthAssessment
 from .training_load import TrainingLoad
+from .player_club import PlayerClub

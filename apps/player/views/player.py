@@ -1,8 +1,12 @@
 from rest_framework import generics, filters, status
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import AllowAny, IsAuthenticated
+
+# from apps.player.serializers.player import PlayerListSerializer
+
+from ...player.querysets import player_list_queryset, player_detail_analytics
 from ..models import Player
-from ..serializers import PlayerSerializer
+from ..serializers import *
 from ..filters import PlayerFilter
 from ...common import *
 
@@ -43,8 +47,13 @@ class PlayerListCreateAPIView(generics.ListCreateAPIView):
             return [IsAuthenticated()]
         return [AllowAny()]
 
+    def get_serializer_class(self):
+        if self.request.method == "GET":
+            return PlayerListSerializer
+        return PlayerSerializer
+
     def get_queryset(self):
-        return Player.objects.select_related("user").all()
+        return player_list_queryset()
 
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
@@ -83,8 +92,30 @@ class PlayerRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
         return Player.objects.select_related("user")
 
     def retrieve(self, request, *args, **kwargs):
-        player = self.get_object()
-        return ApiResponse.success(PlayerSerializer(player).data)
+        player = (
+            Player.objects
+            .select_related("user")
+            .prefetch_related(
+                "club_memberships__club",
+                "awards"
+            )
+            .get(id=kwargs["id"])
+        )
+
+        year = request.query_params.get("year")
+
+        return ApiResponse.success(
+            data={
+                "player": PlayerSerializer(player).data,
+                "analytics": player_detail_analytics(player, year),
+                "clubs": ClubSerializer(
+                    [m.club for m in player.club_memberships.all()],
+                    many=True
+                ).data,
+                "awards": AwardSerializer(player.awards.all(), many=True).data,
+            }
+        )
+
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop("partial", False)
