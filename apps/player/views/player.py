@@ -69,10 +69,14 @@ class PlayerListCreateAPIView(generics.ListCreateAPIView):
         serializer.is_valid(raise_exception=True)
         player = serializer.save()
         return ApiResponse.success(
-            data=PlayerSerializer(player).data,
+            data=PlayerSerializer(
+                player,
+                context={"request": request}
+            ).data,
             message="Player created successfully",
             status=status.HTTP_201_CREATED
         )
+
 
 
 class PlayerRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
@@ -103,16 +107,25 @@ class PlayerRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
         )
 
         year = request.query_params.get("year")
+        serializer_context = {"request": request}
 
         return ApiResponse.success(
             data={
-                "player": PlayerSerializer(player).data,
+                "player": PlayerSerializer(
+                    player,
+                    context=serializer_context
+                ).data,
                 "analytics": player_detail_analytics(player, year),
                 "clubs": ClubSerializer(
                     [m.club for m in player.club_memberships.all()],
-                    many=True
+                    many=True,
+                    context=serializer_context
                 ).data,
-                "awards": AwardSerializer(player.awards.all(), many=True).data,
+                "awards": AwardSerializer(
+                    player.awards.all(),
+                    many=True,
+                    context=serializer_context
+                ).data,
             }
         )
 
