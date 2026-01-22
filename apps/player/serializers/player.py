@@ -45,9 +45,11 @@ class PlayerListSerializer(serializers.ModelSerializer):
         return f"{obj.first_name} {obj.last_name}"
 
     def get_clubs(self, obj):
+        request = self.context.get("request")
         return ClubSerializer(
             [m.club for m in obj.club_memberships.all()],
-            many=True
+            many=True,
+            context={"request": request}
         ).data
 
     def get_goalkeeper_averages(self, obj):

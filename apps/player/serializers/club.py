@@ -3,6 +3,7 @@ from ..models import Club
 
 
 class ClubSerializer(serializers.ModelSerializer):
+    logo = serializers.ImageField(use_url=True)
     class Meta:
         model = Club
         fields = "__all__"
