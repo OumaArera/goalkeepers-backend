@@ -103,7 +103,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 EMAIL_HOST = "mail.kduahministries.org"
-EMAIL_PORT = 465
+EMAIL_PORT = 26
 EMAIL_USE_SSL = True
 EMAIL_USE_TLS = False
 
