@@ -26,6 +26,8 @@ class Player(models.Model):
 
     date_of_birth = models.DateField()
     height = models.DecimalField(max_digits=5, decimal_places=2)
+    weight = models.DecimalField(max_digits=5, decimal_places=2)
+    preferred_foot = models.DecimalField(max_digits=5, decimal_places=2)
     phone = models.CharField(max_length=20)
     email = models.EmailField(blank=True)
 

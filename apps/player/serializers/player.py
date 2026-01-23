@@ -34,6 +34,8 @@ class PlayerListSerializer(serializers.ModelSerializer):
             "avatar",
             "date_of_birth",
             "height",
+            "weight",
+            "preferred_foot",
             "country_of_birth",
             "country_of_residence",
             "goalkeeper_averages",
