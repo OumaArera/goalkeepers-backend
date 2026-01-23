@@ -20,11 +20,11 @@ class UserViewSet(viewsets.ModelViewSet):
 
     # Optional: restrict destructive actions to admins
     def destroy(self, request, *args, **kwargs):
-        if not request.user.is_superuser:
-            return Response(
-                {"detail": "You do not have permission to delete this user."},
-                status=status.HTTP_403_FORBIDDEN
-            )
+        # if not request.user.is_superuser:
+        #     return Response(
+        #         {"detail": "You do not have permission to delete this user."},
+        #         status=status.HTTP_403_FORBIDDEN
+        #     )
         return super().destroy(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
