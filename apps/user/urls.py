@@ -20,7 +20,7 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     #Users
-    path('users/', UserViewSet.as_view(), name='users'),
+    path('users/', UserViewSet.as_view({'get': 'list'}), name='users-list'),
     
     # Password management
     path('change-password/', ChangePasswordAPIView.as_view(), name='change_password'),
