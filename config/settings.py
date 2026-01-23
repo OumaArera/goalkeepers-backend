@@ -125,12 +125,9 @@ DATABASES = {
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': config('DB_HOST'),
         'PORT': config('DB_PORT'),
-        'OPTIONS': {
-            'sslmode': 'require',
-            'sslcert': config('SSL_CERT_PATH', default=''),
-        }
     }
 }
+
 
 
 # Password validation
