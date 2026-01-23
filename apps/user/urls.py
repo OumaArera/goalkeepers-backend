@@ -1,9 +1,11 @@
 from django.urls import path 
 from rest_framework_simplejwt.views import TokenRefreshView # type: ignore
 from .services import CustomTokenObtainPairView
+from rest_framework.routers import DefaultRouter
 from .views import *
 
-
+router = DefaultRouter()
+router.register(r'users', UserViewSet, basename='user')
 
 urlpatterns = [
     # Authentication endpoints
@@ -33,3 +35,4 @@ urlpatterns = [
     path('admin/reset-password/', AdminPasswordResetAPIView.as_view(), name='admin_reset_password'), 
     path('change-password-auth/', ChangePasswordAuthAPIView.as_view(), name='change_password_auth'),
 ]
+urlpatterns += router.urls
