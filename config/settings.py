@@ -17,11 +17,18 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     '159.89.235.222',
+    'goalkeepers.edmondserenity.com',
     'localhost', 
     '127.0.0.1', 
-    '1da73a8587a5.ngrok-free.app'
 ]
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:3000",
+    "https://goalkeepersalliance.org",
+    "https://dashboard.goalkeepersalliance.org",
+    "https://welfare.goalkeepersalliance.org",
+]
 
 
 # Application definition
@@ -45,13 +52,6 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     'apps.user',
     'apps.player',
-    # 'apps.service_center',
-    # 'apps.dealers',
-    # 'apps.fleet',
-    # 'apps.reports',
-    # 'apps.payments',
-    # 'apps.institutions',
-    # 'apps.admin_panel',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
