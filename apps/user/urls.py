@@ -18,6 +18,9 @@ urlpatterns = [
     # Token management
     path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+    #Users
+    path('users/', UserViewSet.as_view(), name='users'),
     
     # Password management
     path('change-password/', ChangePasswordAPIView.as_view(), name='change_password'),
