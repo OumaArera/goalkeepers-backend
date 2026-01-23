@@ -4,7 +4,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 
 # from apps.player.serializers.player import PlayerListSerializer
 
-from ...player.querysets import player_list_queryset, player_detail_analytics
+from ..querysets import player_detail_analytics, player_list_queryset
 from ..models import Player
 from ..serializers import *
 from ..filters import PlayerFilter

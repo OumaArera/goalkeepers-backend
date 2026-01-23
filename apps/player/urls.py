@@ -29,4 +29,10 @@ urlpatterns = [
 
     path("players/<uuid:player_id>/clubs/", PlayerClubListAPIView.as_view(), name="player-club-list"),
     path("player-clubs/", PlayerClubCreateAPIView.as_view(), name="player-club-create"),
+
+    path(
+        "goalkeepers/rankings/",
+        GoalkeeperRankingAPIView.as_view(),
+        name="goalkeeper-rankings"
+    ),
 ]
