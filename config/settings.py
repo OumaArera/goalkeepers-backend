@@ -104,7 +104,7 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 EMAIL_HOST = "mail.kduahministries.org"
 EMAIL_PORT = 26
-EMAIL_USE_SSL = True
+EMAIL_USE_SSL = False
 EMAIL_USE_TLS = False
 
 EMAIL_HOST_USER = config("EMAIL_HOST_USER")
