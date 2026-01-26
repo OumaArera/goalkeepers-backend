@@ -19,3 +19,10 @@ class PlayerClubListAPIView(generics.ListAPIView):
             .filter(player_id=player_id)
             .select_related("club", "player")
         )
+
+
+class PlayerClubRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
+    queryset = PlayerClub.objects.select_related("player", "club")
+    serializer_class = PlayerClubSerializer
+    permission_classes = [IsAuthenticated]
+
