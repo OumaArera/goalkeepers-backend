@@ -4,6 +4,10 @@ from django.conf import settings
 
 
 class Player(models.Model):
+    class Sex(models.TextChoices):
+        MALE = "Male", "Male"
+        FEMALE = "Female", "Female"
+        
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     user = models.OneToOneField(
@@ -28,6 +32,13 @@ class Player(models.Model):
     height = models.DecimalField(max_digits=5, decimal_places=2)
     weight = models.DecimalField(max_digits=5, decimal_places=2)
     preferred_foot = models.CharField(max_length=100, default="Right")
+    sex = models.CharField(
+        max_length=6,
+        choices=Sex.choices,
+        default=Sex.MALE
+    )
+
+    injured = models.BooleanField(default=False)
     phone = models.CharField(max_length=20)
     email = models.EmailField(blank=True)
 

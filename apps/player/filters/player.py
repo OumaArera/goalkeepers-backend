@@ -13,6 +13,11 @@ class PlayerFilter(django_filters.FilterSet):
             "country_of_birth",
             "country_of_residence",
             "is_active",
+            "sex",
+            "injured",
+            "first_name",
+            "last_name",
+            "preferred_foot",
         ]
 
     def filter_country(self, queryset, name, value):

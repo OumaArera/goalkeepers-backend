@@ -35,6 +35,8 @@ class PlayerListSerializer(serializers.ModelSerializer):
             "date_of_birth",
             "height",
             "weight",
+            "sex",
+            "injured",
             "preferred_foot",
             "country_of_birth",
             "country_of_residence",
