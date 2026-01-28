@@ -8,4 +8,4 @@ class ClubFilter(django_filters.FilterSet):
 
     class Meta:
         model = Club
-        fields = ["country", "is_active"]
+        fields = ["country", "is_active", "category"]

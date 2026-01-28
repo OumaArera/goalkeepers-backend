@@ -3,6 +3,12 @@ from django.db import models
 
 
 class Club(models.Model):
+    class Category(models.TextChoices):
+        MEN = "Men", "Men"
+        WOMEN = "Women", "Women"
+        MIXED = "Mixed", "Mixed"
+
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     name = models.CharField(max_length=255, unique=True)
@@ -11,7 +17,11 @@ class Club(models.Model):
 
     country = models.CharField(max_length=100)
     city = models.CharField(max_length=100, blank=True)
-
+    category = models.CharField(
+        max_length=10,
+        choices=Category.choices,
+        default=Category.MEN
+    )
     founded_year = models.PositiveIntegerField(null=True, blank=True)
     stadium_name = models.CharField(max_length=255, blank=True)
 
