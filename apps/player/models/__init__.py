@@ -6,3 +6,6 @@ from .award import Award
 from .physical_health import PhysicalHealthAssessment
 from .training_load import TrainingLoad
 from .player_club import PlayerClub
+from .activity import Activity
+from .play_style import PlayerPlayStyle
+from .appearance import PlayerAppearance

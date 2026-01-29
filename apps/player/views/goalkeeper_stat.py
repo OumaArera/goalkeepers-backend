@@ -1,10 +1,10 @@
 from rest_framework import generics, filters, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
-from ..models import GoalkeeperStat
+from ..models import *
 from ..serializers import *
 from ..filters import GoalkeeperStatFilter
-from ...common import ApiResponse, StandardPagination
+from ...common import *
 from django.db import IntegrityError
 
 
@@ -43,6 +43,7 @@ class GoalkeeperStatsListCreateAPIView(generics.ListCreateAPIView):
 
         try:
             stats = serializer.save()
+            log_model_activity(request.user, Activity.Action.CREATED, stats)
         except IntegrityError:
             return ApiResponse.error(
                 message="Goalkeeper stats for this player and game already exist.",
@@ -81,7 +82,7 @@ class GoalkeeperStatsRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
         )
         serializer.is_valid(raise_exception=True)
         stats = serializer.save()
-
+        log_model_activity(request.user, Activity.Action.UPDATED, stats)
         return ApiResponse.success(
             data=self.get_serializer(stats).data,
             message="Stats updated successfully"

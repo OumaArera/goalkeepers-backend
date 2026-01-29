@@ -2,10 +2,10 @@ from rest_framework import generics, filters, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 
-from ..models import PhysicalHealthAssessment
+from ..models import *
 from ..serializers import *
 from ..filters import PhysicalHealthAssessmentFilter
-from ...common import ApiResponse, StandardPagination
+from ...common import *
 
 
 class HealthAssessmentListCreateAPIView(generics.ListCreateAPIView):
@@ -42,7 +42,7 @@ class HealthAssessmentListCreateAPIView(generics.ListCreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         assessment = serializer.save()
-
+        log_model_activity(request.user, Activity.Action.CREATED, assessment)
         return ApiResponse.success(
             data=self.get_serializer(assessment).data,
             message="Health assessment submitted successfully",
@@ -77,7 +77,7 @@ class HealthAssessmentRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
         )
         serializer.is_valid(raise_exception=True)
         assessment = serializer.save()
-
+        log_model_activity(request.user, Activity.Action.UPDATED, assessment)
         return ApiResponse.success(
             data=self.get_serializer(assessment).data,
             message="Health assessment updated successfully"

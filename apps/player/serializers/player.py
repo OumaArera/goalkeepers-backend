@@ -22,7 +22,8 @@ class PlayerSerializer(serializers.ModelSerializer):
 class PlayerListSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
     goalkeeper_averages = serializers.SerializerMethodField()
-
+    play_styles = serializers.SerializerMethodField()
+    appearances = serializers.SerializerMethodField()
     clubs = serializers.SerializerMethodField()
     awards = AwardSerializer(many=True)
 
@@ -43,6 +44,8 @@ class PlayerListSerializer(serializers.ModelSerializer):
             "goalkeeper_averages",
             "clubs",
             "awards",
+            "play_styles",
+            "appearances",
         ]
 
     def get_full_name(self, obj):
@@ -64,5 +67,20 @@ class PlayerListSerializer(serializers.ModelSerializer):
         } | {
             "clean_sheet_rate": obj.clean_sheet_rate
         }
+
+    def get_play_styles(self, obj):
+        return [ps.label for ps in obj.play_styles.all()]
+
+    
+    def get_appearances(self, obj):
+        return [
+            {
+                "competition": a.competition,
+                "season": a.season,
+                "recognitions": a.recognitions,
+            }
+            for a in obj.appearances.all()
+        ]
+
 
 

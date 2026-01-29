@@ -112,6 +112,7 @@ class TrainingLoad(models.Model):
             models.Index(fields=["session_date"]),
             models.Index(fields=["session_type"]),
             models.Index(fields=["status"]),
+            models.Index(fields=["player", "status"]),
         ]
         unique_together = ("player", "session_date", "session_type")
 

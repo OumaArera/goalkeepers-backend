@@ -1,10 +1,10 @@
 from rest_framework import generics, filters, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
-from ..models import Club
+from ..models import Club, Activity
 from ..serializers import ClubSerializer
 from ..filters import ClubFilter
-from ...common import ApiResponse, StandardPagination
+from ...common import *
 
 
 class ClubListCreateAPIView(generics.ListCreateAPIView):
@@ -41,7 +41,7 @@ class ClubListCreateAPIView(generics.ListCreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         club = serializer.save()
-
+        log_model_activity(request.user, Activity.Action.CREATED, club)
         return ApiResponse.success(
             data=ClubSerializer(club).data,
             message="Club created successfully",
@@ -74,7 +74,7 @@ class ClubRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
         )
         serializer.is_valid(raise_exception=True)
         club = serializer.save()
-
+        log_model_activity(request.user, Activity.Action.UPDATED, club)
         return ApiResponse.success(
             data=ClubSerializer(club).data,
             message="Club updated successfully"

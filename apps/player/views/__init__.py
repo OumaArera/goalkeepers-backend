@@ -7,3 +7,6 @@ from .physical_health import *
 from .training_load import *
 from .player_club import *
 from .goalkeeper_ranking import *
+from .activities import *
+from .play_style import *
+from .appearance import *

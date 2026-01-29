@@ -2,6 +2,7 @@ from django.db.models import (
     Avg, Sum, Count, OuterRef, Subquery,
     FloatField, IntegerField, ExpressionWrapper
 )
+from django.core.cache import cache
 from django.db.models.functions import Coalesce, Cast
 from ..constants import (
     GOALKEEPER_STAT_AVG_FIELDS,
@@ -11,8 +12,22 @@ from ..constants import (
 )
 from ..models import *
 
+def player_base_queryset():
+    return (
+        Player.objects
+        .select_related("user")
+        .prefetch_related(
+            "appearances",
+            "play_styles",
+            "club_memberships__club",
+            "awards",
+        )
+    )
+
 
 def player_list_queryset():
+    base = player_base_queryset()
+
     base_gk_stats = GoalkeeperStat.objects.filter(
         player=OuterRef("pk"),
         status=GoalkeeperStat.Status.APPROVED
@@ -20,7 +35,6 @@ def player_list_queryset():
 
     annotations = {}
 
-    # ─── AVG for all numeric columns (NO booleans) ───────────
     for field in GOALKEEPER_STAT_AVG_FIELDS:
         annotations[f"avg_{field}"] = Coalesce(
             Subquery(
@@ -33,7 +47,6 @@ def player_list_queryset():
             0.0
         )
 
-    # ─── Clean sheet rate (Postgres-safe) ────────────────────
     annotations["clean_sheet_rate"] = Coalesce(
         Subquery(
             base_gk_stats
@@ -53,18 +66,14 @@ def player_list_queryset():
         0.0
     )
 
-    return (
-        Player.objects
-        .select_related("user")
-        .annotate(**annotations)
-        .prefetch_related(
-            "club_memberships__club",
-            "awards",
-        )
-    )
+    return base.annotate(**annotations)
 
 
 def player_detail_analytics(player, year=None):
+    cache_key = f"player:{player.id}:analytics:{year or 'all'}"
+    cached = cache.get(cache_key)
+    if cached:
+        return cached
     # ─────────────────────────────
     # Goalkeeper Stats (last 20 games)
     # ─────────────────────────────
@@ -77,10 +86,31 @@ def player_detail_analytics(player, year=None):
 
     gk_last_20 = gk_stats.select_related("game").order_by("-game__match_date")[:20]
 
+    gk_recent = list(
+        gk_last_20.values(
+            "id",
+            "game_id",
+            "game__match_date",
+            *GOALKEEPER_STAT_AVG_FIELDS,
+            "clean_sheet",
+        )
+    )
+
+
+    gk_aggregates = gk_stats.aggregate(
+        **{field: Avg(field) for field in GOALKEEPER_STAT_AVG_FIELDS},
+        clean_sheet_rate=Cast(
+            Sum(Cast("clean_sheet", IntegerField())),
+            FloatField()
+        ) / Cast(Count("id"), FloatField()),
+        matches_played=Count("id"),
+    )
+
     gk_averages = {
-        field: gk_stats.aggregate(v=Avg(field))["v"] or 0
+        field: gk_aggregates.get(field) or 0
         for field in GOALKEEPER_STAT_AVG_FIELDS
     }
+
 
     gk_clean_sheet_rate = (
         gk_stats.aggregate(
@@ -101,10 +131,16 @@ def player_detail_analytics(player, year=None):
 
     health_last_20 = health_qs.order_by("-assessment_date")[:20]
 
+    health_aggregates = health_qs.aggregate(
+        **{field: Avg(field) for field in PHYSICAL_HEALTH_AVG_FIELDS},
+        records=Count("id"),
+    )
+
     health_averages = {
-        field: health_qs.aggregate(v=Avg(field))["v"] or 0
+        field: health_aggregates.get(field) or 0
         for field in PHYSICAL_HEALTH_AVG_FIELDS
     }
+
 
     # ─────────────────────────────
     # Training Load (last 20)
@@ -118,35 +154,74 @@ def player_detail_analytics(player, year=None):
 
     training_last_20 = training_qs.order_by("-session_date")[:20]
 
+    training_aggregates = training_qs.aggregate(
+        **{field: Sum(field) for field in TRAINING_LOAD_SUM_FIELDS},
+        **{field: Avg(field) for field in TRAINING_LOAD_AVG_FIELDS},
+        sessions=Count("id"),
+    )
+
     training_sums = {
-        field: training_qs.aggregate(v=Sum(field))["v"] or 0
+        field: training_aggregates.get(field) or 0
         for field in TRAINING_LOAD_SUM_FIELDS
     }
 
     training_averages = {
-        field: training_qs.aggregate(v=Avg(field))["v"] or 0
+        field: training_aggregates.get(field) or 0
         for field in TRAINING_LOAD_AVG_FIELDS
     }
+
 
     # ─────────────────────────────
     # Final Response Structure
     # ─────────────────────────────
-    return {
+    data = {
         "goalkeeper": {
-            "recent": list(gk_last_20.values()),
+            "recent": gk_recent,
             "averages": gk_averages,
-            "clean_sheet_rate": round(gk_clean_sheet_rate, 3),
-            "matches_played": gk_stats.count(),
+            "clean_sheet_rate": gk_clean_sheet_rate,
+            "matches_played": gk_aggregates.get("matches_played") or 0,
         },
         "physical_health": {
             "recent": list(health_last_20.values()),
             "averages": health_averages,
-            "records": health_qs.count(),
+            "records": health_aggregates.get("records") or 0,
         },
         "training_load": {
             "recent": list(training_last_20.values()),
             "totals": training_sums,
             "averages": training_averages,
-            "sessions": training_qs.count(),
+            "sessions": training_aggregates.get("sessions") or 0,
         },
     }
+
+    cache.set(cache_key, data, timeout=60 * 5)
+    return data
+
+    # cache.set(cache_key, data, timeout=60 * 5)
+    # return {
+    #     "goalkeeper": {
+    #         "recent": list(
+    #             gk_last_20.values(
+    #                 "id",
+    #                 "game_id",
+    #                 "match_date",
+    #                 *GOALKEEPER_STAT_AVG_FIELDS,
+    #                 "clean_sheet"
+    #             )
+    #         ),
+    #         "averages": gk_averages,
+    #         "clean_sheet_rate": round(gk_clean_sheet_rate, 3),
+    #         "matches_played": gk_stats.count(),
+    #     },
+    #     "physical_health": {
+    #         "recent": list(health_last_20.values()),
+    #         "averages": health_averages,
+    #         "records": health_qs.count(),
+    #     },
+    #     "training_load": {
+    #         "recent": list(training_last_20.values()),
+    #         "totals": training_sums,
+    #         "averages": training_averages,
+    #         "sessions": training_qs.count(),
+    #     },
+    # }

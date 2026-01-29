@@ -1,14 +1,16 @@
 from rest_framework import generics, filters, status
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
 
-# from apps.player.serializers.player import PlayerListSerializer
-
-from ..querysets import player_detail_analytics, player_list_queryset
-from ..models import Player
+from ..querysets import *
+from ..models import *
 from ..serializers import *
 from ..filters import PlayerFilter
 from ...common import *
+
+
 
 
 class PlayerListCreateAPIView(generics.ListCreateAPIView):
@@ -68,6 +70,9 @@ class PlayerListCreateAPIView(generics.ListCreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         player = serializer.save()
+        log_model_activity(request.user, Activity.Action.CREATED, player)
+
+
         return ApiResponse.success(
             data=PlayerSerializer(
                 player,
@@ -78,7 +83,7 @@ class PlayerListCreateAPIView(generics.ListCreateAPIView):
         )
 
 
-
+@method_decorator(cache_page(30), name="retrieve")
 class PlayerRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
     serializer_class = PlayerSerializer
     lookup_field = "id"
@@ -93,39 +98,24 @@ class PlayerRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
         return [AllowAny()]
 
     def get_queryset(self):
-        return Player.objects.select_related("user")
+        return player_base_queryset()
+
 
     def retrieve(self, request, *args, **kwargs):
         player = (
-            Player.objects
-            .select_related("user")
-            .prefetch_related(
-                "club_memberships__club",
-                "awards"
-            )
+            player_base_queryset()
             .get(id=kwargs["id"])
         )
 
         year = request.query_params.get("year")
-        serializer_context = {"request": request}
 
         return ApiResponse.success(
             data={
-                "player": PlayerSerializer(
+                "player": PlayerDetailSerializer(
                     player,
-                    context=serializer_context
+                    context={"request": request}
                 ).data,
                 "analytics": player_detail_analytics(player, year),
-                "clubs": ClubSerializer(
-                    [m.club for m in player.club_memberships.all()],
-                    many=True,
-                    context=serializer_context
-                ).data,
-                "awards": AwardSerializer(
-                    player.awards.all(),
-                    many=True,
-                    context=serializer_context
-                ).data,
             }
         )
 
@@ -139,6 +129,8 @@ class PlayerRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
         )
         serializer.is_valid(raise_exception=True)
         player = serializer.save()
+        log_model_activity(request.user, Activity.Action.UPDATED, player)
+
 
         return ApiResponse.success(
             PlayerSerializer(player).data,

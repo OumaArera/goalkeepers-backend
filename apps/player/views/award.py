@@ -2,10 +2,10 @@ from rest_framework import generics, filters, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 
-from ..models import Award
+from ..models import Award, Activity
 from ..serializers import *
 from ..filters import AwardFilter
-from ...common import ApiResponse, StandardPagination
+from ...common import *
 
 
 class AwardListCreateAPIView(generics.ListCreateAPIView):
@@ -42,7 +42,7 @@ class AwardListCreateAPIView(generics.ListCreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         award = serializer.save()
-
+        log_model_activity(request.user, Activity.Action.CREATED, award)
         return ApiResponse.success(
             data=AwardSerializer(award).data,
             message="Award submitted successfully",
@@ -75,7 +75,7 @@ class AwardRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
         )
         serializer.is_valid(raise_exception=True)
         award = serializer.save()
-
+        log_model_activity(request.user, Activity.Action.UPDATED, award)
         return ApiResponse.success(
             data=self.get_serializer(award).data,
             message="Award updated successfully"

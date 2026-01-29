@@ -107,6 +107,8 @@ class GoalkeeperStat(models.Model):
             models.Index(fields=["game"]),
             models.Index(fields=["player"]),
             models.Index(fields=["status"]),
+            models.Index(fields=["player", "status"]),
+            models.Index(fields=["player", "status", "game"]),
         ]
 
     def __str__(self):

@@ -1,7 +1,7 @@
 from rest_framework import generics, filters, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
-from ..models import Game
+from ..models import *
 from ..serializers import GameSerializer
 from ..filters import GameFilter
 from ...common import *
@@ -57,7 +57,7 @@ class GameListCreateAPIView(generics.ListCreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         game = serializer.save()
-
+        log_model_activity(request.user, Activity.Action.CREATED, game)
         return ApiResponse.success(
             data=GameSerializer(game).data,
             message="Game created successfully",
@@ -90,7 +90,7 @@ class GameRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
         )
         serializer.is_valid(raise_exception=True)
         game = serializer.save()
-
+        log_model_activity(request.user, Activity.Action.UPDATED, game)
         return ApiResponse.success(
             GameSerializer(game).data,
             message="Game updated successfully"

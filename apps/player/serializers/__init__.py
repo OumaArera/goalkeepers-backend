@@ -7,3 +7,7 @@ from .physical_health import *
 from .training_load import *
 from .player_club import PlayerClubSerializer
 from .goalkeeper_ranking import GoalkeeperRankingSerializer
+from .activity import *
+from .play_style import PlayerPlayStyleSerializer
+from .appearance import PlayerAppearanceSerializer
+from .player_detail import PlayerDetailSerializer

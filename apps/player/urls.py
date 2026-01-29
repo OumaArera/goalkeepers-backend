@@ -30,6 +30,14 @@ urlpatterns = [
     path("players/<uuid:player_id>/clubs/", PlayerClubListAPIView.as_view(), name="player-club-list"),
     path("player-clubs/", PlayerClubCreateAPIView.as_view(), name="player-club-create"),
     path("player-clubs/<uuid:pk>/", PlayerClubRetrieveUpdateAPIView.as_view(), name="player-club-update"),
+    path("activities/me/", MyActivityListAPIView.as_view(), name="my-activities"),
+
+    path("player/play-styles/", PlayerPlayStyleCreateAPIView.as_view(), name="play-styles-create"),
+    path("play-styles/<uuid:id>", PlayerPlayStyleDeleteAPIView.as_view(), name="play-styles-delete"),
+
+    path("player/appearances/", PlayerAppearanceCreateAPIView.as_view(), name="player-appearances-create"),
+    path("player/<uuid:player_id>/appearances/", PlayerAppearanceListAPIView.as_view(), name="player-appearances-list"),
+    path("player/appearances/<uuid:id>/", PlayerAppearanceRetrieveUpdateAPIView.as_view(), name="player-appearances-update"),
 
     path(
         "goalkeepers/rankings/",

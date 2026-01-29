@@ -101,6 +101,7 @@ class PhysicalHealthAssessment(models.Model):
             models.Index(fields=["assessment_type"]),
             models.Index(fields=["assessment_date"]),
             models.Index(fields=["status"]),
+            models.Index(fields=["player", "status"]),
         ]
         unique_together = ("player", "assessment_date", "assessment_type")
 

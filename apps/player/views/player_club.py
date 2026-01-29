@@ -1,12 +1,22 @@
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from ..models import PlayerClub
+from ..models import *
 from ..serializers import PlayerClubSerializer
+from ...common import *
 
 
 class PlayerClubCreateAPIView(generics.CreateAPIView):
     serializer_class = PlayerClubSerializer
     permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        player_club = serializer.save()
+
+        log_model_activity(
+            user=self.request.user,
+            action=Activity.Action.CREATED,
+            instance=player_club
+        )
 
 
 class PlayerClubListAPIView(generics.ListAPIView):
@@ -25,4 +35,15 @@ class PlayerClubRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
     queryset = PlayerClub.objects.select_related("player", "club")
     serializer_class = PlayerClubSerializer
     permission_classes = [IsAuthenticated]
+
+    def perform_update(self, serializer):
+        player_club = serializer.save()
+
+        log_model_activity(
+            user=self.request.user,
+            action=Activity.Action.UPDATED,
+            instance=player_club
+        )
+
+
 

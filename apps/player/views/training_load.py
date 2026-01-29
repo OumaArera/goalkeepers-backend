@@ -2,10 +2,10 @@ from rest_framework import generics, filters, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 
-from ..models import TrainingLoad
+from ..models import *
 from ..serializers import *
 from ..filters import TrainingLoadFilter
-from ...common import ApiResponse, StandardPagination
+from ...common import *
 
 
 class TrainingLoadListCreateAPIView(generics.ListCreateAPIView):
@@ -40,7 +40,7 @@ class TrainingLoadListCreateAPIView(generics.ListCreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         load = serializer.save()
-
+        log_model_activity(request.user, Activity.Action.CREATED, load)
         return ApiResponse.success(
             data=self.get_serializer(load).data,
             message="Training load recorded successfully",
@@ -91,7 +91,7 @@ class TrainingLoadApprovalAPIView(generics.UpdateAPIView):
         serializer = self.get_serializer(load, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(reviewed_by=request.user)
-
+        log_model_activity(request.user, Activity.Action.UPDATED, load)
         return ApiResponse.success(
             data=serializer.data,
             message="Training load status updated successfully"
