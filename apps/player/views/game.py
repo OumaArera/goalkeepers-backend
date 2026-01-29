@@ -19,17 +19,21 @@ class GameListCreateAPIView(generics.ListCreateAPIView):
 
     filterset_class = GameFilter
     search_fields = [
-        "home_team",
-        "away_team",
+        "home_team__name",
+        "home_team__short_name",
+        "away_team__name",
+        "away_team__short_name",
         "competition",
         "season",
     ]
+
     ordering_fields = [
         "match_date",
         "created_at",
-        "home_team",
-        "away_team",
+        "home_team__name",
+        "away_team__name",
     ]
+
     ordering = ["-match_date"]
 
     def get_permissions(self):
