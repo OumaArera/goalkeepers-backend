@@ -1,6 +1,6 @@
-from rest_framework import viewsets, status
-from rest_framework.response import Response
+from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.filters import SearchFilter
 from ..models import User
 from ..serializers import UserSerializer
 from ...common import *
@@ -15,8 +15,10 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = User.objects.all().order_by('-created_at')
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]  # adjust as needed
+    permission_classes = [IsAuthenticated] 
     pagination_class = StandardPagination
+
+    filter_backends = [SearchFilter]
     search_fields = ["first_name", "last_name", "email", "phone", "role"]
 
     # Optional: restrict destructive actions to admins
