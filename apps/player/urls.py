@@ -38,6 +38,7 @@ urlpatterns = [
     path("player/appearances/", PlayerAppearanceCreateAPIView.as_view(), name="player-appearances-create"),
     path("player/<uuid:player_id>/appearances/", PlayerAppearanceListAPIView.as_view(), name="player-appearances-list"),
     path("player/appearances/<uuid:id>/", PlayerAppearanceRetrieveUpdateAPIView.as_view(), name="player-appearances-update"),
+    path("player/appearances/<uuid:id>/", PlayerAppearanceDeleteAPIView.as_view(), name="player-appearances-delete"),
 
     path(
         "goalkeepers/rankings/",

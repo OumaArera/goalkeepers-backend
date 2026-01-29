@@ -11,3 +11,4 @@ from .activity import *
 from .play_style import PlayerPlayStyleSerializer
 from .appearance import PlayerAppearanceSerializer
 from .player_detail import PlayerDetailSerializer
+from .club_minimal import ClubMinimalSerializer
