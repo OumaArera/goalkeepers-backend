@@ -79,6 +79,7 @@ class EmailService:
             logger.error(f"API email sending error for {recipient_email}: {str(e)}")
             return False, f"Email API service error: {str(e)}"
     
+    
     @staticmethod
     def send_email(recipient_email: str, recipient_name: str, subject: str, 
                   html_content: str, plain_content: str = None) -> Tuple[bool, str]:
@@ -158,6 +159,39 @@ class EmailService:
 
         return EmailService.send_email(
             recipient_email=recipient_email,
+            recipient_name=recipient_name,
+            subject=subject,
+            html_content=html_content,
+            plain_content=plain_content
+        )
+    
+    @staticmethod
+    def send_forgot_password_email(
+        user_email: str,
+        recipient_name: str,
+        generated_password: str
+    ) -> Tuple[bool, str]:
+        """
+        Sends a password reset email containing a newly generated password
+        and login link to the dashboard.
+        """
+
+        logger.info(f"Sending forgot-password email to {user_email}")
+
+        try:
+            subject, html_content, plain_content = (
+                PasswordTemplateService.get_password_email_content(
+                    password=generated_password,
+                    recipient_name=recipient_name,
+                    is_admin_created=False
+                )
+            )
+        except Exception as e:
+            logger.error(f"Password email template generation failed: {str(e)}")
+            return False, "Failed to generate password email template"
+
+        return EmailService.send_email(
+            recipient_email=user_email,
             recipient_name=recipient_name,
             subject=subject,
             html_content=html_content,

@@ -5,3 +5,4 @@ from .club import ClubFilter
 from .award import AwardFilter
 from .physical_health import PhysicalHealthAssessmentFilter
 from .training_load import TrainingLoadFilter
+from .goalkeeper_award import *

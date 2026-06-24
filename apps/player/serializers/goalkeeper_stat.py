@@ -1,8 +1,13 @@
 from rest_framework import serializers
 from ..models import GoalkeeperStat
+from .keeper_stats import *
+from .game import GameSerializer
 
 
 class GoalkeeperStatSerializer(serializers.ModelSerializer):
+    player = GoalkeeperStatPlayerSerializer(read_only=True)
+    game = GameSerializer(read_only=True)
+
     class Meta:
         model = GoalkeeperStat
         fields = "__all__"
@@ -19,7 +24,6 @@ class GoalkeeperStatSerializer(serializers.ModelSerializer):
         game = attrs.get("game")
         player = attrs.get("player")
 
-        # Only validate on CREATE
         if self.instance is None:
             exists = GoalkeeperStat.objects.filter(
                 game=game,
@@ -41,7 +45,8 @@ class GoalkeeperStatSerializer(serializers.ModelSerializer):
         request = self.context["request"]
         validated_data["created_by"] = request.user
         return super().create(validated_data)
-    
+
+
 class GoalkeeperStatsApprovalSerializer(serializers.ModelSerializer):
     class Meta:
         model = GoalkeeperStat

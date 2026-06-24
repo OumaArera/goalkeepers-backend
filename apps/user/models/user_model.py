@@ -36,6 +36,7 @@ class User(AbstractUser):
         ('manager', 'Manager'),
         ('sponsor', 'Sponsor'),
         ('admin', 'System Administrator'),
+        ('bold', 'Bold n Rooted'),
     ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

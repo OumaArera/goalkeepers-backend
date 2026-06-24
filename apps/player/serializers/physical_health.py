@@ -1,8 +1,12 @@
 from rest_framework import serializers
 from ..models import PhysicalHealthAssessment
+from .keeper_stats import GoalkeeperStatPlayerSerializer
+from ...user.serializers import UserSerializer
 
 
 class PhysicalHealthAssessmentSerializer(serializers.ModelSerializer):
+    player = GoalkeeperStatPlayerSerializer(read_only=True)
+    assessed_by = UserSerializer(read_only=True)
     class Meta:
         model = PhysicalHealthAssessment
         fields = "__all__"

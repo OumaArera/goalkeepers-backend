@@ -46,6 +46,7 @@ class PlayerListSerializer(serializers.ModelSerializer):
             "awards",
             "play_styles",
             "appearances",
+            "is_active"
         ]
 
     def get_full_name(self, obj):

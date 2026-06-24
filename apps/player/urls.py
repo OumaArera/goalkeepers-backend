@@ -9,7 +9,7 @@ urlpatterns = [
     path("games/<uuid:id>/", GameRetrieveUpdateAPIView.as_view(), name="game-detail"),
     
     path("goalkeeper-stats/", GoalkeeperStatsListCreateAPIView.as_view(), name="goalkeeper-stats-list-create"),
-    path("goalkeeper-stats/<uuid:id>/", GoalkeeperStatsRetrieveUpdateAPIView.as_view(), name="goalkeeper-stats-detail"),
+    path("goalkeeper-stats/<uuid:id>/", GoalkeeperStatsRetrieveUpdateDestroyAPIView.as_view(), name="goalkeeper-stats-detail"),
     path("goalkeeper-stats/<uuid:id>/approve/", GoalkeeperStatsApprovalAPIView.as_view(), name="goalkeeper-stats-approve"),
 
     path("clubs/", ClubListCreateAPIView.as_view(), name="club-list-create"),
@@ -39,6 +39,12 @@ urlpatterns = [
     path("player/<uuid:player_id>/appearances/", PlayerAppearanceListAPIView.as_view(), name="player-appearances-list"),
     path("player/appearances/<uuid:id>/", PlayerAppearanceRetrieveUpdateAPIView.as_view(), name="player-appearances-update"),
     path("player/appearances/<uuid:id>/", PlayerAppearanceDeleteAPIView.as_view(), name="player-appearances-delete"),
+
+    # path("goalkeepers-awards/", GoalkeeperAwardEventListCreateAPIView.as_view(), name="goalkeepers-awards-all"),
+    # path("award-nominations/", GoalkeeperAwardNominationListCreateAPIView.as_view(), name="award-nomination"),
+    # path("award-winners/", GoalkeeperAwardWinnerCreateAPIView.as_view(), name="award-winner"),
+
+    path("dashboard/summary/", DashboardSummaryAPIView.as_view(), name="dashboard-summary"),
 
     path(
         "goalkeepers/rankings/",

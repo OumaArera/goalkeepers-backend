@@ -9,3 +9,4 @@ from .player_club import PlayerClub
 from .activity import Activity
 from .play_style import PlayerPlayStyle
 from .appearance import PlayerAppearance
+# from .goalkeeper_award import *

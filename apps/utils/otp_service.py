@@ -57,7 +57,6 @@ class OTPService:
         )
         
         logger.info(f"OTP created in database for {email} (type: {otp_type})")
-        print(f"OTP saved to database with ID: {otp.id}")
         
         # Send email if requested
         email_success = True

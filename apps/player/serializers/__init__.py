@@ -12,3 +12,5 @@ from .play_style import PlayerPlayStyleSerializer
 from .appearance import PlayerAppearanceSerializer
 from .player_detail import PlayerDetailSerializer
 from .club_minimal import ClubMinimalSerializer
+# from .goalkeeper_award import *
+from .keeper_stats import *

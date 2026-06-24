@@ -2,9 +2,10 @@ from rest_framework import status
 from rest_framework.views import APIView 
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response 
-from django.contrib.auth import get_user_model 
+from django.contrib.auth import get_user_model
+
 from ..serializers import *
-from ...utils import OTPService
+from ...utils import *
 from ..services import JWTService
 
 User = get_user_model()
@@ -44,42 +45,57 @@ class ChangePasswordAPIView(APIView):
 
 
 class ForgotPasswordAPIView(APIView):
-    """Request password reset OTP"""
+    """
+    Reset password directly and email the new password to the user.
+    No authentication required.
+    """
     permission_classes = [AllowAny]
-    
+
     def post(self, request):
         serializer = ForgotPasswordSerializer(data=request.data)
-        if serializer.is_valid():
-            email = serializer.validated_data['email']
-            
-            try:
-                user = User.objects.get(email=email, is_active=True)
-                
-                if self._is_user_blocked(user):
-                    return Response({'error': 'Account is blocked'}, 
-                                  status=status.HTTP_403_FORBIDDEN)
-                
-                return self._send_reset_otp(email)
-                
-            except User.DoesNotExist:
-                return Response({'error': 'User not found'}, 
-                              status=status.HTTP_404_NOT_FOUND)
-        
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def _is_user_blocked(self, user):
-        """Check if user account is blocked"""
-        return user.is_blocked
-    
-    def _send_reset_otp(self, email):
-        """Generate and send password reset OTP"""
-        otp_instance, success, message = OTPService.create_otp(email, 'password_reset')
-        # success, message = OTPService.send_otp_email(email, otp.code, 'password_reset')
-        
-        if not success:
-            return Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)
-        
-        return Response({'message': 'Password reset OTP sent to your email'})
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        email = serializer.validated_data['email']
+
+        try:
+            user = User.objects.get(email=email, is_active=True)
+
+            if user.is_blocked:
+                return Response(
+                    {'error': 'Account is blocked'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            new_password = generate_random_password()
+
+            user.set_password(new_password)
+            user.save()
+
+            EmailService.send_forgot_password_email(
+                user_email=user.email,
+                recipient_name=user.get_full_name() or user.email,
+                generated_password=new_password
+            )
+
+
+            # 4. (Optional) Generate JWT tokens
+            token_data = JWTService.create_tokens_for_user(user)
+
+            return Response(
+                {
+                    'message': 'A new password has been sent to your email.',
+                    **token_data
+                },
+                status=status.HTTP_200_OK
+            )
+
+        except User.DoesNotExist:
+            return Response(
+                {'error': 'User not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
 
 class ResetPasswordAPIView(APIView):

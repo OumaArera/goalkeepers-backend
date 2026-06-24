@@ -157,7 +157,95 @@ class EmailTemplateService:
 
    
 class PasswordTemplateService:
-    # ... (Rest of the class remains the same)
+    
+    @staticmethod
+    def get_password_email_content(
+        password: str,
+        recipient_name: str,
+        is_admin_created: bool = True
+    ) -> Tuple[str, str, str]:
+
+        login_url = getattr(
+            settings,
+            "DASHBOARD_LOGIN_URL",
+            "https://dashboard.goalkeepersalliance.org/login"
+        )
+
+        if is_admin_created:
+            subject = "Welcome to Goalkeepers Alliance! Your Account Details"
+            intro_message = (
+                f"Hello {recipient_name}, your Goalkeepers Alliance account has been "
+                f"created by an administrator. Below are your temporary login details."
+            )
+        else:
+            subject = "Your Goalkeepers Alliance Password Has Been Reset"
+            intro_message = (
+                f"Hello {recipient_name}, your Goalkeepers Alliance password has been reset. "
+                f"Below is your new temporary password."
+            )
+
+        note_message = "Please log in immediately and change your password."
+
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <title>{subject}</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+            <div style="max-width: 600px; margin: auto; background: #ffffff; padding: 30px; border-radius: 8px;">
+                <h2>{subject}</h2>
+                <p>{intro_message}</p>
+
+                <p><strong>Your temporary password:</strong></p>
+                <div style="font-size: 22px; font-weight: bold; padding: 15px; background: #f8f9fa; text-align: center;">
+                    {password}
+                </div>
+
+                <p style="margin-top: 25px;">
+                    👉 <a href="{login_url}" target="_blank">
+                        Click here to log in to your account
+                    </a>
+                </p>
+
+                <p style="color: #dc3545; font-weight: bold;">
+                    {note_message}
+                </p>
+
+                <hr>
+                <p style="font-size: 12px; color: #777;">
+                    This is a sensitive email. Do not share this password with anyone.
+                </p>
+
+                <p>
+                    Best regards,<br>
+                    <strong>Goalkeepers Alliance Team</strong>
+                </p>
+            </div>
+        </body>
+        </html>
+        """
+
+        plain_content = f"""
+        {subject}
+
+        {intro_message}
+
+        Temporary password:
+        {password}
+
+        Login here:
+        {login_url}
+
+        {note_message}
+
+        ---
+        This is a sensitive email. Do not share this password with anyone.
+        """
+
+        return subject, html_content.strip(), plain_content.strip()
+
     @staticmethod
     def get_password_email_content(password: str, recipient_name: str, is_admin_created: bool = True) -> Tuple[str, str, str]:
         # ... (Implementation as provided in the prompt)

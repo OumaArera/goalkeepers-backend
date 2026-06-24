@@ -57,12 +57,14 @@ class GoalkeeperStatsListCreateAPIView(generics.ListCreateAPIView):
         )
 
 
-class GoalkeeperStatsRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
-    serializer_class = GoalkeeperStatFilter
+class GoalkeeperStatsRetrieveUpdateDestroyAPIView(
+    generics.RetrieveUpdateDestroyAPIView
+):
+    serializer_class = GoalkeeperStatSerializer
     lookup_field = "id"
 
     def get_permissions(self):
-        if self.request.method in ["PUT", "PATCH"]:
+        if self.request.method in ["PUT", "PATCH", "DELETE"]:
             return [IsAuthenticated()]
         return [AllowAny()]
 
@@ -72,20 +74,45 @@ class GoalkeeperStatsRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
         )
 
     def retrieve(self, request, *args, **kwargs):
-        return ApiResponse.success(self.get_serializer(self.get_object()).data)
+        stats = self.get_object()
+        serializer = self.get_serializer(stats)
+        return ApiResponse.success(serializer.data)
 
     def update(self, request, *args, **kwargs):
+        stats = self.get_object()
         serializer = self.get_serializer(
-            self.get_object(),
+            stats,
             data=request.data,
             partial=True
         )
         serializer.is_valid(raise_exception=True)
-        stats = serializer.save()
-        log_model_activity(request.user, Activity.Action.UPDATED, stats)
+        updated_stats = serializer.save()
+
+        log_model_activity(
+            request.user,
+            Activity.Action.UPDATED,
+            updated_stats
+        )
+
         return ApiResponse.success(
-            data=self.get_serializer(stats).data,
+            data=self.get_serializer(updated_stats).data,
             message="Stats updated successfully"
+        )
+
+    def destroy(self, request, *args, **kwargs):
+        stats = self.get_object()
+
+        log_model_activity(
+            request.user,
+            Activity.Action.DELETED,
+            stats
+        )
+
+        stats.delete()
+
+        return ApiResponse.success(
+            message="Stats deleted successfully",
+            status=status.HTTP_204_NO_CONTENT
         )
 
 

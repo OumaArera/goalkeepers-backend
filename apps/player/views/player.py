@@ -45,7 +45,7 @@ class PlayerListCreateAPIView(generics.ListCreateAPIView):
         Public access for GET,
         Authentication required for POST
         """
-        if self.request.method == "POST":
+        if self.request.method == "PUT":
             return [IsAuthenticated()]
         return [AllowAny()]
 
@@ -84,7 +84,7 @@ class PlayerListCreateAPIView(generics.ListCreateAPIView):
 
 
 @method_decorator(cache_page(30), name="retrieve")
-class PlayerRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
+class PlayerRetrieveUpdateAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PlayerSerializer
     lookup_field = "id"
 
@@ -93,7 +93,7 @@ class PlayerRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
         Public access for GET,
         Authentication required for PUT/PATCH
         """
-        if self.request.method in ["PUT", "PATCH"]:
+        if self.request.method in ["PUT", "PATCH", "DELETE"]:
             return [IsAuthenticated()]
         return [AllowAny()]
 
@@ -136,3 +136,16 @@ class PlayerRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
             PlayerSerializer(player).data,
             message="Player updated successfully"
         )
+    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        log_model_activity(request.user, Activity.Action.DELETED, instance)
+        self.perform_destroy(instance)
+
+        return ApiResponse.success(
+            data=None,
+            message="Player deleted successfully",
+            status=status.HTTP_204_NO_CONTENT
+        )
+
+

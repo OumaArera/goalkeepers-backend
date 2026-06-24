@@ -13,7 +13,7 @@ class UserViewSet(viewsets.ModelViewSet):
     - Update user
     - Delete user
     """
-    queryset = User.objects.all().order_by('-created_at')
+    queryset = User.objects.exclude(role="bold").order_by('-created_at')
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated] 
     pagination_class = StandardPagination

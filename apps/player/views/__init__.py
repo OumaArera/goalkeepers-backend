@@ -10,3 +10,5 @@ from .goalkeeper_ranking import *
 from .activities import *
 from .play_style import *
 from .appearance import *
+# from .goalkeeper_award import *
+from .dashboard_summary import DashboardSummaryAPIView

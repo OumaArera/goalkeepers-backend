@@ -45,7 +45,7 @@ class Player(models.Model):
     country_of_birth = models.CharField(max_length=100)
     country_of_residence = models.CharField(max_length=100)
 
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
