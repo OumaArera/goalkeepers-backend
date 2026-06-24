@@ -17,10 +17,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '159.89.235.222',
-    'goalkeepers.edmondserenity.com',
-    'localhost', 
-    '127.0.0.1', 
+    '*',
 ]
 
 CORS_ALLOWED_ORIGINS = [
