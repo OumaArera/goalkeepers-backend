@@ -24,6 +24,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:3000",
     "https://boldnrooted.org",
+    "https://dashboard.boldnrooted.org",
     "https://dashboard.goalkeepersalliance.org",
     "https://welfare.goalkeepersalliance.org",
 ]
