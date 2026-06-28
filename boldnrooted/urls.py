@@ -7,9 +7,8 @@ router = DefaultRouter()
 urlpatterns = [
     # Authentication endpoints
     path('blogs/', BlogListCreateAPIView.as_view(), name='blogs-create'),
-    path('blogs/', BlogRetrieveUpdateAPIView.as_view(), name='blogs-retrive'),
     path(
-        'retrieve-blogs/<uuid:id>/',
+        'blogs/<uuid:id>/',
         BlogRetrieveUpdateAPIView.as_view(),
         name='blogs-retrieve'
     ),
